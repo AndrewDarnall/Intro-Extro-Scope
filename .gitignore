@@ -1,0 +1,5 @@
+/data/01-GDELT-23/*
+/data/02-Common-Crawl/*
+
+!/data/01-GDELT-23/*.ps1
+!/data/02-Common-Crawl/*.ps1
