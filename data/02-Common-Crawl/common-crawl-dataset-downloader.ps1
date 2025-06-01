@@ -1,45 +1,54 @@
-# download_commoncrawl_latest.ps1
+# Define base URL and local directory
+$baseUrl = "https://data.commoncrawl.org/crawl-data/CC-MAIN-2025-21"
+$localDir = Get-Location  # current directory where script runs
 
-# Set base URL and local output directory
-$baseUrl = "https://data.commoncrawl.org/"
-$outputFolder = Get-Location
+# Paths to the .gz file and decompressed paths file in current dir
+$wetPathsGz = Join-Path $localDir "wet.paths.gz"
+$wetPaths = Join-Path $localDir "wet.paths"
 
-# Step 1: Download the latest wet.paths.gz file (updated to the latest crawls - from the year 2025)
-$wetPathsGz = Join-Path $outputFolder "wet.paths.gz"
-Invoke-WebRequest -Uri "${baseUrl}crawl-data/CC-MAIN-2025-21/wet.paths.gz" -OutFile $wetPathsGz
+# Download the wet.paths.gz file
+Write-Host "Downloading wet.paths.gz from $baseUrl/wet.paths.gz ..."
+Invoke-WebRequest -Uri "$baseUrl/wet.paths.gz" -OutFile $wetPathsGz -ErrorAction Stop
 
-# Step 2: Extract wet.paths.gz
-$wetPathsFile = Join-Path $outputFolder "wet.paths"
-if (Test-Path $wetPathsFile) { Remove-Item $wetPathsFile -Force }
-# Use gzip decompression instead of zip expansion for .gz
-$inStream = [System.IO.Compression.GzipStream]::new([System.IO.File]::OpenRead($wetPathsGz), [System.IO.Compression.CompressionMode]::Decompress)
-$outStream = [System.IO.File]::Create($wetPathsFile)
-$inStream.CopyTo($outStream)
-$inStream.Close()
-$outStream.Close()
+# Decompress wet.paths.gz to wet.paths
+try {
+    Write-Host "Decompressing wet.paths.gz ..."
+    $fileStream = [IO.File]::OpenRead($wetPathsGz)
+    $gzipStream = New-Object IO.Compression.GzipStream($fileStream, [IO.Compression.CompressionMode]::Decompress)
+    $outputFileStream = [IO.File]::OpenWrite($wetPaths)
 
-# Step 3: Read list of WET file paths
-$wetPaths = Get-Content -Path $wetPathsFile
+    $buffer = New-Object byte[] 8192
+    while (($read = $gzipStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+        $outputFileStream.Write($buffer, 0, $read)
+    }
 
-# Step 4: Download first N files (approx. 5GB total)
-$filesToDownload = 12  # Change this if needed
+    $outputFileStream.Close()
+    $gzipStream.Close()
+    $fileStream.Close()
+} catch {
+    Write-Error "Failed to decompress wet.paths.gz: $_"
+    exit 1
+}
 
-for ($i = 0; $i -lt $filesToDownload; $i++) {
-    $relativePath = $wetPaths[$i]
-    $fileName = Split-Path -Path $relativePath -Leaf
-    $url = "$baseUrl$relativePath"
-    $outFile = Join-Path $outputFolder $fileName
+# Read all WET file paths from wet.paths
+$wetFilePaths = Get-Content $wetPaths
 
-    if (-Not (Test-Path $outFile)) {
-        Write-Host "Downloading: $fileName"
+# Download each .warc.wet.gz file to current directory
+foreach ($path in $wetFilePaths) {
+    $fileName = Split-Path $path -Leaf
+    $localFilePath = Join-Path $localDir $fileName
+    $fileUrl = "https://data.commoncrawl.org/$path"
+    if (-Not (Test-Path $localFilePath)) {
+        Write-Host "Downloading $fileName ..."
         try {
-            Invoke-WebRequest -Uri $url -OutFile $outFile -ErrorAction Stop
+            Invoke-WebRequest -Uri $fileUrl -OutFile $localFilePath -ErrorAction Stop
+        } catch {
+            Write-Warning ("Failed to download " + $fileName + ": " + $_)
         }
-        catch {
-            Write-Warning "Failed to download: $url"
-        }
-        Start-Sleep -Milliseconds 300
+
     } else {
-        Write-Host "Already exists: $fileName"
+        Write-Host "$fileName already exists, skipping download."
     }
 }
+
+Write-Host "Download complete. Files are in $localDir"
