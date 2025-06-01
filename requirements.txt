@@ -1,1 +1,10 @@
 warcio==1.7.5
+gsutil==5.31
+gcloud==0.18.3
+google-cloud-storage==3.1.0
+google-cloud==3.34.0
+jupyter==1.1.1
+notebook==7.4.3
+jupyterlab==4.4.3
+pandas=2.2.3
+db-dtypes==1.4.3

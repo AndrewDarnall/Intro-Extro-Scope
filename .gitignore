@@ -1,7 +1,9 @@
 /data/01-GDELT-23/*
 /data/02-Common-Crawl/*
 /data/03-Introvert-vs-Extrovert-Behavior/*
+/env/*
 
 !/data/01-GDELT-23/*.ps1
 !/data/02-Common-Crawl/*.ps1
 !/data/03-Introvert-vs-Extrovert-Behavior/.gitkeep
+!/env/.gitkeep
