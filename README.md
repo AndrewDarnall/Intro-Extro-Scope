@@ -51,25 +51,18 @@ The entire pipeline is deployed using **BigQuery SQL for analytics**, **Databric
 
 ---
 
-## 📉 Sample Visualizations (To Complete)
+## 📉 Analysis Results
 
-> *(Include these after generating with Matplotlib/Seaborn/Plotly)*
-
-| Feature Correlation Heatmap | Personality Trait Distribution |
-|-----------------------------|-------------------------------|
-| ![Heatmap](visualizations/heatmap.png) | ![Dist](visualizations/trait_dist.png) |
+![Looker Studio Dashboard](./assets/imgs/Analysis-Results.png)
 
 ---
 
-## 🔮 Predictive Models (Enter the used model/models) (To Complete)
+## 🔮 Data Enrichment with Logistic Regressor
 
-| Model         | Accuracy | F1 Score |
-|---------------|----------|----------|
-| Logistic Reg. | 0.89     | 0.88     |
-| Random Forest | 0.93     | 0.91     |
-| XGBoost       | 0.94     | 0.93     |
+| Train AUC         | Validation AUC | Test AUC |
+|-------------------|----------------|----------|
+| 0.911             | 0.870          | 0.92     |
 
-*(Add actual numbers when complete.)*
 
 ---
 
