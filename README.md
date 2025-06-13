@@ -66,15 +66,32 @@ The entire pipeline is deployed using **BigQuery SQL for analytics**, **Databric
 
 ---
 
-## 🚀 How to Run (To Complete)
+## 🚀 How to Run The Local Jupyter Lab Notebook
 
 ```bash
 # Clone repo
 git clone https://github.com/yourusername/introextroscope.git
 cd introextroscope
+```
 
-# Open Databricks and import notebooks
-# Connect to BigQuery dataset and start EDA
+1) Download the following `dependencies`
+
+| `Software`   |  `Version` |
+|--------------|------------|
+| `Python`     | `3.13.2`   |
+| `pip`        | `25.0`     |
+
+2) Download the `python` dependecies required to run the `notebook` locally
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+3) Run the `jupyter lab` notebook
+
+```bash
+cd ./notebooks
+jupyter lab
 ```
 
 ---
